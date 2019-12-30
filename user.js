@@ -14,6 +14,10 @@ const userSchema = mongoose.Schema({
         required: true,
         minlength: 6
     },
+    name:{
+        type: String,
+        required: true
+    },
     nric:{
         type: String,
         required: true

@@ -23,6 +23,7 @@ app.get('/api/user/register', (req, res)=>{
         const user = new User({
             username: req.body.username,
             password: req.body.password,
+            name: req.body.name,
             nric: req.body.nric,
             nationality: req.body.nationality,
             age: req.body.age,
