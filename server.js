@@ -19,7 +19,7 @@ const { User } = require('./user')
 app.use(bodyParser.json()); //Converts data to JSON format
 
 //Post user data to database
-app.get('/api/user/register', (req, res)=>{
+app.post('/api/user/register', (req, res)=>{
         const user = new User({
             username: req.body.username,
             password: req.body.password,
@@ -47,11 +47,13 @@ app.post('/api/user/login', (req, res)=>{
 
     //checks that user exists
     User.findOne({'username': req.body.username}, (err, user)=>{
-        if(!user) res.json({message: 'Login failed, user not found'})
-
+        if(!user) return res.json({message: 'Login failed, user not found'})
         //if user found it will compare password
         user.comparePassword(req.body.password, (err, isMatch)=>{
-            if(err) throw err;
+            if(err) {
+                res.status(400).send({'res':err})
+                return;
+            } 
             if(!isMatch) return res.status(400).json({
                 message:'Incorrect Password'
             });
