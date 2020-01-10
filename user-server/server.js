@@ -1,9 +1,24 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const multer  = require('multer');
 const app = express();
+const path = require('path');
 var fs = require('fs');
+
+const { PythonShell } = require('python-shell');
+
+var pyPath = 'C:/Users/Alfie/Desktop/backend/python-app/venv/Scripts/python.exe';
+var spPath = 'C:/Users/Alfie/Desktop/backend/python-app/'
+const pythonPath = path.resolve(__dirname, pyPath);
+const scriptPath = path.resolve(__dirname, spPath);
+
+let options = {
+    mode: 'text',
+    pythonPath: pythonPath ,
+    pythonOptions: ['-u'], // get print results in real-time
+    scriptPath: scriptPath,
+    args: []
+  };
 
 //Connect to mongoose database
 mongoose.connect('mongodb://localhost:27017/client',  {
@@ -98,7 +113,7 @@ const uploadImage = async (req, res, next) => {
     try {
  
         // to declare some path to store your converted image
-        const path = '../python-server/'+Date.now()+'.png'
+        const path = '../python-app/'+'signature'+'.png'
         
         const imgdata = req.body.base64image;
 
@@ -107,6 +122,8 @@ const uploadImage = async (req, res, next) => {
         
         fs.writeFileSync(path, base64Data,  {encoding: 'base64'});
  
+        scriptExecution = new PythonShell('app.py', options) ;
+
         return res.send(path);
  
     } catch (e) {
