@@ -7,16 +7,14 @@ var fs = require('fs');
 
 const { PythonShell } = require('python-shell');
 
-var pyPath = 'C:/Users/Alfie/Desktop/backend/python-app/venv/Scripts/python.exe';
-var spPath = 'C:/Users/Alfie/Desktop/backend/python-app/'
-const pythonPath = path.resolve(__dirname, pyPath);
-const scriptPath = path.resolve(__dirname, spPath);
+var envPath = '/home/easeloan/Desktop/backend/python-app/venv/bin/python';
+var dirPath = '/home/easeloan/Desktop/backend/python-app/';
 
 let options = {
     mode: 'text',
-    pythonPath: pythonPath ,
+    pythonPath: envPath,
     pythonOptions: ['-u'], // get print results in real-time
-    scriptPath: scriptPath,
+    scriptPath: dirPath,
     args: []
   };
 
@@ -53,10 +51,10 @@ app.post('/api/user/register', (req, res)=>{
             residentialStatus: req.body.residentialStatus
         }).save((err, response)=>{
             if(err) {
-                res.status(400).send({'res':err})
+                res.status(400).send({'res':err});
                 return;
             } 
-            res.status(200).send({'res':'You have Successfully Signed up'})
+            res.status(200).send({'res':'You have Successfully Signed up'});
         })
 })
 
@@ -75,33 +73,32 @@ app.post('/api/user/login', (req, res)=>{
             if(!isMatch) return res.status(400).json({
                 message:'Incorrect Password'
             });
-            res.status(200).send({'res':'You have Successfully Logged in'})
+            res.status(200).send({'res':'You have Successfully Logged in'});
         })
     })
 })
 
 app.get('/api/user/data/:id', (req, res)=>{
-    var id = req.params.id
+    var id = req.params.id;
     User.findOne({ username: id }, function (err, results) {
         if (err) return console.error(err)
         try {
-            res.status(200).send(results)
+            res.status(200).send(results);
         } catch (error) {
-            console.log("errror getting results")
-            res.status(400).send(err)}
+            console.log("errror getting results");
+            res.status(400).send(err)};
     });
 })
 
 //Get pdf document from local dir
 app.get('/api/:filename', function(req, res){
-    var dir = './pdf-docs/'
+    var dir = './pdf-docs/';
     var tempFile= dir + req.params.filename + '.pdf';
     fs.readFile(tempFile, function (err,data){
        res.contentType("application/pdf");
        res.send(data);
        if (err) {
-        console.log("Error");
-        console.log(err);
+            console.log(err);
         } else {
             console.log("Success");
         }
@@ -113,7 +110,7 @@ const uploadImage = async (req, res, next) => {
     try {
  
         // to declare some path to store your converted image
-        const path = '../python-app/'+'signature'+'.png'
+        const path = '../python-app/'+'signature'+'.png';
         
         const imgdata = req.body.base64image;
 
@@ -122,9 +119,16 @@ const uploadImage = async (req, res, next) => {
         
         fs.writeFileSync(path, base64Data,  {encoding: 'base64'});
  
-        scriptExecution = new PythonShell('app.py', options) ;
-
-        return res.send(path);
+        // to execute python script
+        PythonShell.run('app.py', options, function (err, results) {
+            if (err) {
+                console.log(err);
+                return res.status(400).send(err);
+            } else {
+                console.log(results);
+                return res.status(200).send("Success");
+            }
+        });
  
     } catch (e) {
         next(e);
