@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const app = express();
 const path = require('path');
+var _ = require('lodash');
 var fs = require('fs');
 
 const { PythonShell } = require('python-shell');
@@ -35,7 +36,7 @@ app.use(bodyParser.urlencoded({ extended: false, limit: '50mb' }));
 app.use(bodyParser.json()); //Converts data to JSON format
 
 //Post user data to database
-app.post('/api/user/register', (req, res)=>{
+app.post('/register', (req, res)=>{
         const user = new User({
             username: req.body.username,
             password: req.body.password,
@@ -58,9 +59,26 @@ app.post('/api/user/register', (req, res)=>{
         })
 })
 
-//Login to access client application
-app.post('/api/user/login', (req, res)=>{
+//Update user information
+app.put('/update/:id', (req, res)=>{
+    //checks that user exists
+    User.findById(req.params.id, function(err, post) {
+        if (err) return next(err);
+        
+        _.assign(post, req.body); // update user
+        post.save(function(err) {
+            if (err) {
+                    res.status(400).send({'res':err})
+                    return;
+                } 
+                    return res.status(200).send("Success");
+        })
+    });
+});
 
+
+//Login to access client application
+app.post('/login', (req, res)=>{
     //checks that user exists
     User.findOne({'username': req.body.username}, (err, user)=>{
         if(!user) return res.json({message: 'Login failed, user not found'})
@@ -78,7 +96,8 @@ app.post('/api/user/login', (req, res)=>{
     })
 })
 
-app.get('/api/user/data/:id', (req, res)=>{
+//Get user information
+app.get('/data/:id', (req, res)=>{
     var id = req.params.id;
     User.findOne({ username: id }, function (err, results) {
         if (err) return console.error(err)
@@ -91,7 +110,7 @@ app.get('/api/user/data/:id', (req, res)=>{
 })
 
 //Get pdf document from local dir
-app.get('/api/:filename', function(req, res){
+app.get('/:filename', function(req, res){
     var dir = './pdf-docs/';
     var tempFile= dir + req.params.filename + '.pdf';
     fs.readFile(tempFile, function (err,data){
@@ -135,8 +154,8 @@ const uploadImage = async (req, res, next) => {
     }
 }
  
-//Upload image api
-app.post('/api/image', uploadImage)
+//Upload signature to loan contract
+app.post('/sign', uploadImage)
 
 const port = process.env.PORT || 4000;
 
