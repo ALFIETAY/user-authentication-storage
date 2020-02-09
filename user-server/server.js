@@ -8,15 +8,22 @@ var fs = require('fs');
 
 const { PythonShell } = require('python-shell');
 
-var envPath = '/home/easeloan/Desktop/backend/python-app/venv/bin/python';
-var dirPath = '/home/easeloan/Desktop/backend/python-app/';
+// var envPath = '/home/easeloan/Desktop/backend/python-app/venv/bin/python';
+// var dirPath = '/home/easeloan/Desktop/backend/python-app/';
+var envPath = 'C:/Users/Alfie/Desktop/backend/python-app/venv/Scripts/python.exe'
+var dirPath = 'C:/Users/Alfie/Desktop/backend/python-app'
+
+app.locals.name = "";
+app.locals.loanAmount = 0;
+app.locals.loanTenure = 0;
+
 
 let options = {
     mode: 'text',
     pythonPath: envPath,
     pythonOptions: ['-u'], // get print results in real-time
     scriptPath: dirPath,
-    args: []
+    args: [app.locals.name, app.locals.loanAmount, app.locals.loanTenure]
   };
 
 //Connect to mongoose database
@@ -104,7 +111,7 @@ app.get('/data/:id', (req, res)=>{
         try {
             res.status(200).send(results);
         } catch (error) {
-            console.log("errror getting results");
+            console.log("error getting results");
             res.status(400).send(err)};
     });
 })
@@ -161,4 +168,31 @@ const port = process.env.PORT || 4000;
 
 app.listen(port, ()=> {
     console.log('Server is running on ' + port)
+})
+
+//Generates loan contract
+app.post('/generate', (req, res)=>{
+    // set variables
+    let contractOptions = {
+        mode: 'text',
+        pythonPath: envPath,
+        pythonOptions: ['-u'], // get print results in real-time
+        scriptPath: dirPath,
+        args: [req.body.name, req.body.loanAmount, req.body.loanTenure]
+      };
+    try {
+        // execute python script
+        PythonShell.run('contract.py', contractOptions, function (err, results) {
+            if (err) {
+                console.log(err);
+                return res.status(400).send(err);
+            } else {
+                console.log(results);
+                return res.status(200).send("Success");
+            }
+        });
+    }
+    catch (e) {
+        next(e);
+    }
 })
