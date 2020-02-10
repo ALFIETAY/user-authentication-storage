@@ -3,7 +3,8 @@ import os
 import stat
 
 # define files
-input_file = os.path.abspath("../python-app/pdf-docs/home_loan_contract.pdf")
+# input_file = os.path.abspath("../python-app/pdf-docs/home_loan_contract.pdf")
+input_file = os.path.abspath("../user-server/pdf-docs/default_loan_contract.pdf")
 output_file = "loan_contract.pdf"
 signature_file = os.path.abspath("../python-app/signature.png")
 
