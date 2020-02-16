@@ -8,10 +8,8 @@ var fs = require('fs');
 
 const { PythonShell } = require('python-shell');
 
-// var envPath = '/home/easeloan/Desktop/backend/python-app/venv/bin/python';
-// var dirPath = '/home/easeloan/Desktop/backend/python-app/';
-var envPath = 'C:/Users/Alfie/Desktop/backend/python-app/venv/Scripts/python.exe'
-var dirPath = 'C:/Users/Alfie/Desktop/backend/python-app'
+var envPath = '/home/easeloan/Desktop/backend/python-app/venv/bin/python';
+var dirPath = '/home/easeloan/Desktop/backend/python-app/';
 
 app.locals.name = "";
 app.locals.loanAmount = 0;
